@@ -49,9 +49,9 @@ public class Wobble_Goal_Test extends LinearOpMode {
     private DigitalChannel button;
 
     //constants
-    private final double LIFT_POWER = 0.6;
+    private final double LIFT_POWER = 0.8;
     private final double CLOSED_SERVO_POSITION = 0.28;
-    private final double OPEN_SERVO_POSITION = 0.7;
+    private final double OPEN_SERVO_POSITION = 0.9;
 
     @Override
     public void runOpMode() {
