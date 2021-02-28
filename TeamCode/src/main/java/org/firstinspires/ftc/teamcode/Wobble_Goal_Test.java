@@ -45,13 +45,16 @@ public class Wobble_Goal_Test extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor liftMotor;
-    private Servo latchServo;
-    private DigitalChannel button;
+    private Servo rightServo;
+    private Servo leftServo;
+    //private DigitalChannel button;
 
     //constants
     private final double LIFT_POWER = 0.8;
-    private final double CLOSED_SERVO_POSITION = 0.28;
-    private final double OPEN_SERVO_POSITION = 0.9;
+    private final double CLOSED_LEFT_SERVO = 0.28;
+    private final double CLOSED_RIGHT_SERVO = 0.8;
+    private final double OPEN_LEFT_SERVO = 0.8;
+    private final double OPEN_RIGHT_SERVO = 0.28;
 
     @Override
     public void runOpMode() {
@@ -61,20 +64,14 @@ public class Wobble_Goal_Test extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        liftMotor = hardwareMap.get(DcMotor.class, "wobble_lifter");
-        latchServo = hardwareMap.get(Servo.class,"latchservo");
-        button = hardwareMap.get(DigitalChannel.class,"button");
+        liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
+        leftServo = hardwareMap.get(Servo.class,"leftServo");
+        rightServo = hardwareMap.get(Servo.class,"rightServo");
 
         // Most robots need the motor on one side to be reversed to drive forward
         liftMotor.setDirection(DcMotor.Direction.FORWARD);
 
-        //Specify that motorOnButton is an input
-        button.setMode(DigitalChannel.Mode.INPUT);
-
-        //variable for the servo position
-        double servoPosition = OPEN_SERVO_POSITION;
-
-        boolean isInMode2 = false;
+        //boolean isInMode2 = false;
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -101,43 +98,46 @@ public class Wobble_Goal_Test extends LinearOpMode {
             motorPower    = Range.clip(motorPower, -1.0, 1.0) ;
 
             //if we are in mode 1 use A andB buttons to toggle open and close
-            if(isInMode2 == false){
-                if(gamepad1.a == true){
-                    servoPosition = OPEN_SERVO_POSITION;
-                }
-                else if(gamepad1.b == true){
-                    servoPosition = CLOSED_SERVO_POSITION;
-                }
+            //if(isInMode2 == false){
+            if(gamepad1.a == true){
+                leftServo.setPosition(OPEN_LEFT_SERVO);
+                rightServo.setPosition(OPEN_RIGHT_SERVO);
             }
+            else if(gamepad1.b == true){
+                leftServo.setPosition(CLOSED_LEFT_SERVO);
+                rightServo.setPosition(CLOSED_RIGHT_SERVO);
+            }
+            //}
             //If we are in mode 2 set the default position to closed. Allow the user to open the hand
             //by holding the A button.
-            else {
+            /*else {
                 if (gamepad1.a == true) {
-                    servoPosition = OPEN_SERVO_POSITION;
+                    leftServoPos = OPEN_LEFT_SERVO;
+                    rightServoPos = OPEN_RIGHT_SERVO;
                 }
                 else {
-                        servoPosition = CLOSED_SERVO_POSITION;
+                    leftServoPos = CLOSED_LEFT_SERVO;
+                    rightServoPos = CLOSED_RIGHT_SERVO;
                 }
             }
-
+                */
             //If the wobble goal button is pressed go to mode 2
-            if(button.getState() == false){
+            /*if(button.getState() == false){
                 isInMode2 = true;
-            }
+            }*/
             //Allow the user to reset to Mode 1 when the X button is pressed
-            if(gamepad1.x == true){
-                isInMode2 = false;
-            }
+            //if(gamepad1.x == true){
+            //    isInMode2 = false;
+            //}
 
             // Send the power to the motor
             liftMotor.setPower(motorPower);
 
-            //set the servo position
-            latchServo.setPosition(servoPosition);
-            
             // Show the elapsed game time
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addLine("Button state:"+button.getState());
+            telemetry.addLine("GamePad A:"+gamepad1.a);
+            telemetry.addLine("GamePad B:"+gamepad1.b);
+            //telemetry.addLine("Button state:"+button.getState());
             telemetry.update();
         }
     }
