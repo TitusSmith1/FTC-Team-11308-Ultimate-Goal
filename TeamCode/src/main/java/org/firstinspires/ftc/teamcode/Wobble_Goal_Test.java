@@ -34,9 +34,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 @TeleOp(name="Wobble Goal Test", group="Linear Opmode")
@@ -47,7 +51,9 @@ public class Wobble_Goal_Test extends LinearOpMode {
     private DcMotor liftMotor;
     private Servo rightServo;
     private Servo leftServo;
-    //private DigitalChannel button;
+
+    // Color sensor
+    NormalizedColorSensor colorSensor;
 
     //constants
     private final double LIFT_POWER = 0.8;
@@ -55,6 +61,7 @@ public class Wobble_Goal_Test extends LinearOpMode {
     private final double CLOSED_RIGHT_SERVO = 0.8;
     private final double OPEN_LEFT_SERVO = 0.8;
     private final double OPEN_RIGHT_SERVO = 0.28;
+    private final double WOBBLE_GOAL_DIST = 10.0;
 
     @Override
     public void runOpMode() {
@@ -68,6 +75,9 @@ public class Wobble_Goal_Test extends LinearOpMode {
         leftServo = hardwareMap.get(Servo.class,"leftServo");
         rightServo = hardwareMap.get(Servo.class,"rightServo");
 
+        //Initialize Color sensor
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
+
         // Most robots need the motor on one side to be reversed to drive forward
         liftMotor.setDirection(DcMotor.Direction.FORWARD);
 
@@ -76,6 +86,13 @@ public class Wobble_Goal_Test extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+
+        //boolean to hold the current mode
+        boolean isInMode2 = false;
+
+        //Variables to hold the servo power
+        double rightServoPos = CLOSED_RIGHT_SERVO;
+        double leftServoPos = CLOSED_LEFT_SERVO;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -98,19 +115,19 @@ public class Wobble_Goal_Test extends LinearOpMode {
             motorPower    = Range.clip(motorPower, -1.0, 1.0) ;
 
             //if we are in mode 1 use A andB buttons to toggle open and close
-            //if(isInMode2 == false){
-            if(gamepad1.a == true){
-                leftServo.setPosition(OPEN_LEFT_SERVO);
-                rightServo.setPosition(OPEN_RIGHT_SERVO);
+            if(isInMode2 == false){
+                if(gamepad1.a == true){
+                    leftServoPos = OPEN_LEFT_SERVO;
+                    rightServoPos = OPEN_RIGHT_SERVO;
+                }
+                else if(gamepad1.b == true){
+                    leftServoPos = CLOSED_LEFT_SERVO;
+                    rightServoPos = CLOSED_RIGHT_SERVO;
+                }
             }
-            else if(gamepad1.b == true){
-                leftServo.setPosition(CLOSED_LEFT_SERVO);
-                rightServo.setPosition(CLOSED_RIGHT_SERVO);
-            }
-            //}
             //If we are in mode 2 set the default position to closed. Allow the user to open the hand
             //by holding the A button.
-            /*else {
+            else {
                 if (gamepad1.a == true) {
                     leftServoPos = OPEN_LEFT_SERVO;
                     rightServoPos = OPEN_RIGHT_SERVO;
@@ -120,24 +137,24 @@ public class Wobble_Goal_Test extends LinearOpMode {
                     rightServoPos = CLOSED_RIGHT_SERVO;
                 }
             }
-                */
             //If the wobble goal button is pressed go to mode 2
-            /*if(button.getState() == false){
+            if(((DistanceSensor)colorSensor).getDistance(DistanceUnit.CM) <= WOBBLE_GOAL_DIST){
                 isInMode2 = true;
-            }*/
+            }
             //Allow the user to reset to Mode 1 when the X button is pressed
-            //if(gamepad1.x == true){
-            //    isInMode2 = false;
-            //}
+            if(gamepad1.x == true){
+                isInMode2 = false;
+            }
 
             // Send the power to the motor
             liftMotor.setPower(motorPower);
 
+            //Set the position of the servos
+            leftServo.setPosition(leftServoPos);
+            rightServo.setPosition(rightServoPos);
+
             // Show the elapsed game time
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addLine("GamePad A:"+gamepad1.a);
-            telemetry.addLine("GamePad B:"+gamepad1.b);
-            //telemetry.addLine("Button state:"+button.getState());
             telemetry.update();
         }
     }
