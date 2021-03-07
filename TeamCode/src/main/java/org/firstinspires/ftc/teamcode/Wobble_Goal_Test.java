@@ -57,11 +57,11 @@ public class Wobble_Goal_Test extends LinearOpMode {
 
     //constants
     private final double LIFT_POWER = 0.8;
-    private final double CLOSED_LEFT_SERVO = 0.28;
-    private final double CLOSED_RIGHT_SERVO = 0.8;
-    private final double OPEN_LEFT_SERVO = 0.8;
-    private final double OPEN_RIGHT_SERVO = 0.28;
-    private final double WOBBLE_GOAL_DIST = 10.0;
+    private final double CLOSED_LEFT_SERVO = 0.0;
+    private final double CLOSED_RIGHT_SERVO = 0.6;
+    private final double OPEN_LEFT_SERVO = 0.6;
+    private final double OPEN_RIGHT_SERVO = 0.0;
+    private final double WOBBLE_GOAL_DIST = 7.0;
 
     @Override
     public void runOpMode() {
@@ -138,7 +138,7 @@ public class Wobble_Goal_Test extends LinearOpMode {
                 }
             }
             //If the wobble goal button is pressed go to mode 2
-            if(((DistanceSensor)colorSensor).getDistance(DistanceUnit.CM) <= WOBBLE_GOAL_DIST){
+            if(((DistanceSensor)colorSensor).getDistance(DistanceUnit.CM) <= WOBBLE_GOAL_DIST && rightServoPos == OPEN_RIGHT_SERVO){
                 isInMode2 = true;
             }
             //Allow the user to reset to Mode 1 when the X button is pressed
