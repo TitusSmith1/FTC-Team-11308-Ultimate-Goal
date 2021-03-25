@@ -312,7 +312,7 @@ public class DriverControl extends LinearOpMode {
                 ringStopper.setPower(-RING_STOPPER_POWER);
             }
             else {
-                if(numPasses >= 700){
+                if(numPasses >= 60){
                     numPasses = 0;
                     ringStopperPower *= -1;
 
